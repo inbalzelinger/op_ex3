@@ -11,7 +11,7 @@
 
 enum bool{true, false};
 
-int readAndCompare(int firstFd , int secondPd);
+int readAndCompare(int firstFd , int secondFd);
 int ignoreChar(char* buff);
 int checkIfReadSucced(int reader);
 
@@ -38,7 +38,16 @@ int main(int argc, char **argv) {
 
 
 
-int readAndCompare(int firstFd , int secondPd) {
+/**
+* function name: readAndCompare
+* the function reads the files it gets (throgh the files Fd) and return
+ * if the files are equals / similar / different.
+ * @param firstFd - the first file pointer , secondFd - the second file pointer
+* @return -  int - 3 to equals , 2 to similar , 1 to different.
+**/
+
+
+int readAndCompare(int firstFd , int secondFd) {
 	char buffFirst[SIZE_TO_READ] = {0};
 	char buffSec[SIZE_TO_READ]= {0};
 	size_t size = SIZE_TO_READ;
@@ -46,7 +55,7 @@ int readAndCompare(int firstFd , int secondPd) {
 	int flagSecond = 0;
 	enum bool isEqual = true;
 	enum bool isSimilar = true;
-	flagSecond = read(secondPd , buffSec , size);
+	flagSecond = read(secondFd , buffSec , size);
 	flagFirst = read(firstFd , buffFirst , size);
 	checkIfReadSucced(flagFirst);
 	checkIfReadSucced(flagSecond);
@@ -66,14 +75,14 @@ int readAndCompare(int firstFd , int secondPd) {
 					}
 					flagFirst = read(firstFd, buffFirst, size);
 					checkIfReadSucced(flagFirst);
-					flagSecond = read(secondPd, buffSec, size);
+					flagSecond = read(secondFd, buffSec, size);
 					checkIfReadSucced(flagSecond);
 				}
 			} while (ignoreChar(buffFirst) && flagFirst != 0);
 		} else if (ignoreChar(buffSec)) {
 			isEqual = false;
 			do {
-				flagSecond = read(secondPd, buffSec, size);
+				flagSecond = read(secondFd, buffSec, size);
 				checkIfReadSucced(flagSecond);
 			} while (ignoreChar(buffSec) && flagSecond != 0);
 		}
@@ -86,7 +95,7 @@ int readAndCompare(int firstFd , int secondPd) {
 		buffSec[0] = 0;
 		flagFirst = read(firstFd, buffFirst, size);
 		checkIfReadSucced(flagFirst);
-		flagSecond = read(secondPd, buffSec, size);
+		flagSecond = read(secondFd, buffSec, size);
 		checkIfReadSucced(flagSecond);
 	}
 	if (isEqual == true) {
@@ -99,6 +108,12 @@ int readAndCompare(int firstFd , int secondPd) {
 }
 
 
+/**
+* function name: checkIfReadSucced
+* the function checks if read was succsesful.
+ * @param reader - the int that a function read had return.
+* @return - int - -1 if the read failed.
+**/
 
 
 int checkIfReadSucced(int reader) {
@@ -106,9 +121,17 @@ int checkIfReadSucced(int reader) {
 		fprintf(stderr, "Error in system call");
 		exit(-1);
 	}
+	return 1;
 }
 
 
+/**
+* function name: ignoreChar
+* the function gets pointer to char and checks if it is ignorable.
+ * @param buff.
+* @return - int - 1 if the char is ignorable
+ * 				0 - else.
+**/
 
 int ignoreChar(char* buff) {
 	if ((buff[0] == '\n')  || (buff[0] == ' ')) {
