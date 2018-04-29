@@ -12,14 +12,13 @@
 enum bool{true, false};
 
 int readAndCompare(int firstFd , int secondFd);
-int ignoreChar(char* buff);
+//int ignoreChar(char* buff);
 int checkIfReadSucced(int reader);
 
 
 
 int main(int argc, char **argv) {
 	int arg = 0;
-	char check2[1];
 	//check this if on the U2~~!!!! because of the arguments number.
 	if (argc < 3 || argc > 3) {
 		printf("the arguments are illegal please try again\n");
@@ -55,50 +54,41 @@ int readAndCompare(int firstFd , int secondFd) {
 	int flagSecond = 0;
 	enum bool isEqual = true;
 	enum bool isSimilar = true;
-	flagSecond = read(secondFd , buffSec , size);
 	flagFirst = read(firstFd , buffFirst , size);
+	flagSecond = read(secondFd , buffSec , size);
 	checkIfReadSucced(flagFirst);
 	checkIfReadSucced(flagSecond);
 	while (flagFirst != 0 || flagSecond != 0) {
 		if (buffFirst[0] != buffSec[0]) {
 			isEqual = false;
 		}
-		if (ignoreChar(buffFirst)) {
-			do {
-				if (!ignoreChar(buffSec)) {
-					isEqual = false;
-					flagFirst = read(firstFd, buffFirst, size);
-					checkIfReadSucced(flagFirst);
-				} else {
-					if (buffFirst[0] != buffSec[0]) {
-						isEqual = false;
-					}
-					flagFirst = read(firstFd, buffFirst, size);
-					checkIfReadSucced(flagFirst);
-					flagSecond = read(secondFd, buffSec, size);
-					checkIfReadSucced(flagSecond);
-				}
-			} while (ignoreChar(buffFirst) && flagFirst != 0);
-		} else if (ignoreChar(buffSec)) {
-			isEqual = false;
-			do {
+		if (flagFirst == 0) {
+			buffFirst[0] = '\0';
+		} else if (flagSecond == 0) {
+			buffSec[0] = '\0';
+		}
+		if (buffFirst[0] == ' ' || buffFirst[0] == '\n') {
+			flagFirst = read(firstFd, buffFirst, size);
+			checkIfReadSucced(flagFirst);
+			if (buffSec[0] == ' ' || buffSec[0] == '\n') {
 				flagSecond = read(secondFd, buffSec, size);
 				checkIfReadSucced(flagSecond);
-			} while (ignoreChar(buffSec) && flagSecond != 0);
+			}
+		} else if (buffSec[0] == ' ' || buffSec[0] == '\n') {
+			flagSecond = read(secondFd, buffSec, size);
+			checkIfReadSucced(flagSecond);
+		} else {
+			if (buffFirst[0] != buffSec[0] + 32 && buffFirst[0] != buffSec[0] - 32 &&
+				buffFirst[0] != buffSec[0]) {
+				isSimilar = false;
+			}
+			flagFirst = read(firstFd, buffFirst, size);
+			checkIfReadSucced(flagFirst);
+			flagSecond = read(secondFd, buffSec, size);
+			checkIfReadSucced(flagSecond);
 		}
-		///check endPoint case.
-		if (buffFirst[0] != buffSec[0] + 32 && buffFirst[0] != buffSec[0] - 32 &&
-			buffFirst[0] != buffSec[0]) {
-			isSimilar = false;
-		}
-		buffFirst[0] = 0;
-		buffSec[0] = 0;
-		flagFirst = read(firstFd, buffFirst, size);
-		checkIfReadSucced(flagFirst);
-		flagSecond = read(secondFd, buffSec, size);
-		checkIfReadSucced(flagSecond);
 	}
-	if (isEqual == true) {
+		if (isEqual == true) {
 		return 3;
 	} else if (isSimilar == true) {
 		return 2;
@@ -108,12 +98,15 @@ int readAndCompare(int firstFd , int secondFd) {
 }
 
 
+
+
 /**
 * function name: checkIfReadSucced
-* the function checks if read was succsesful.
- * @param reader - the int that a function read had return.
-* @return - int - -1 if the read failed.
+* the function checks if a read was successful
+ * @param reader.
+* @return -  int - 1 if the read didn't failed.
 **/
+
 
 
 int checkIfReadSucced(int reader) {
@@ -125,43 +118,5 @@ int checkIfReadSucced(int reader) {
 }
 
 
-/**
-* function name: ignoreChar
-* the function gets pointer to char and checks if it is ignorable.
- * @param buff.
-* @return - int - 1 if the char is ignorable
- * 				0 - else.
-**/
-
-int ignoreChar(char* buff) {
-	if ((buff[0] == '\n')  || (buff[0] == ' ')) {
-		return 1;
-	} else {
-		return 0;
-	}
-}
 
 
-
-//enum bool readsCharAndIgnore(int fileNumber , int secoundFileNumber , char firstBuff[] , char secoundBuff[],
-//							 int firstFileFd , int secFilePd) {
-//
-//	enum bool isEqual = true;
-//	do {
-//		if (!ignoreChar(secoundBuff)) {
-//			isEqual = false;
-//			fileNumber = read(firstFileFd, firstBuff, SIZE_TO_READ);
-//			checkIfReadSucced(fileNumber);
-//		} else {
-//			if (firstBuff[0] != secoundBuff[0]) {
-//				isEqual = false;
-//			}
-//			fileNumber = read(firstFileFd, firstBuff, SIZE_TO_READ);
-//			checkIfReadSucced(fileNumber);
-//			secoundFileNumber = read(secFilePd, secoundBuff, SIZE_TO_READ);
-//			checkIfReadSucced(secoundFileNumber);
-//		}
-//	} while (ignoreChar(firstBuff) && fileNumber != 0);
-//	return isEqual;
-//}
-//
